@@ -4,7 +4,6 @@ const Rx = require('rx');
 const $ = Rx.Observable;
 const {Subject} = Rx;
 
-const studio = require('./studio');
 const instrument = require('./instrument');
 const sequencer = require('./sequencer');
 const midiMap = require('./midi-map');
@@ -15,21 +14,19 @@ const {measureToBeatLength} = require('../util/math');
 
 const stream = new Subject();
 
-const init = () => stream.onNext(state => ({
-	bpm: '120',
-	measure: '4/4',
-	beatLength: 16,
+const initial = {
 	instrument: {
 		eg: {
 			attack: 0,
 			decay: 0.04,
-			sustain: 0.08,
+			sustain: 0.8,
 			release: 0.08
 		},
 		vco: {
 			type: 'square'
 		},
 		lfo: {
+			on: false,
 			type: 'sawtooth',
 			frequency: 0,
 			gain: 0
@@ -53,19 +50,16 @@ const init = () => stream.onNext(state => ({
 		[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 	],
-	playing: false,
-	tickIndex: -1,
 	midi: {
 		inputs: [],
 		outputs: []
 	}
-}));
+};
 
 module.exports = {
-	stream: $.merge(stream, studio.stream, instrument.stream, sequencer.stream, midiMap.stream),
-	studio,
+	stream: $.merge(stream, instrument.stream, sequencer.stream, midiMap.stream),
 	instrument,
 	sequencer,
 	midiMap,
-	init
+	initial
 };
